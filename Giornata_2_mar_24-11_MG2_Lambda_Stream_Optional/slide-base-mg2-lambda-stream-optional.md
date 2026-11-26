@@ -19,11 +19,13 @@ Le classi `Libro`, `Genere`, `Prestito` sono quelle di MG1.
   - `Predicate<T>`: `T` → `boolean` (metodo `test`)
   - `Function<T, R>`: `T` → `R` (metodo `apply`)
   - `Consumer<T>`: usa un `T`, non restituisce nulla (metodo `accept`)
+  - `BiConsumer<T, U>`: usa due valori `T` e `U`, non restituisce nulla (metodo `accept`)
   - `Supplier<T>`: nessun parametro, restituisce un `T` (metodo `get`)
   - `Comparator<T>`: confronta due `T` (metodo `compare`)
   - `Runnable`: nessun parametro, nessun risultato (il compito dei thread di MG1)
 - **Riferimento a metodo**: forma breve di una lambda che chiama solo un metodo (`Libro::titolo`, `System.out::println`, `ArrayList::new`)
 - **Composizione**: `Predicate` ha `and`, `or`, `negate`; `Function` ha `andThen`
+- **Versioni «Bi»**: `BiConsumer`, `BiFunction`, `BiPredicate` sono le varianti con **due parametri** di `Consumer`, `Function`, `Predicate`; il caso tipico è `Map.forEach`, che riceve chiave e valore
 - Una lambda può usare le variabili locali esterne solo se sono **effectively final** (non riassegnate)
 - **Strategy**: scegliere un algoritmo a runtime; con le lambda non serve una classe per ogni variante
 
@@ -53,8 +55,10 @@ System.out.println(titolo.apply(rosa));       // Il nome della rosa
 stampa.accept(rosa);
 System.out.println(oggi.get());
 
+Comparator<String> ordineTitolo = (a, b) -> a.titolo().compareTo(b.titolo); 
 // Con le collezioni
 catalogo.sort((a, b) -> a.titolo().compareTo(b.titolo()));   // Comparator come lambda
+catalogo.sort(ordineTitolo);
 catalogo.forEach(stampa);                                    // Consumer applicato a ogni elemento
 ```
 
@@ -103,6 +107,29 @@ System.out.println(entrambi.apply(100.0));                                // 85.
 - `andThen` esegue prima la funzione di partenza, poi quella passata (`compose` fa l'ordine opposto)
 - Si costruiscono regole complesse componendo regole semplici
 - Stesso schema di `Predicate.and` e `or`: piccole condizioni combinate
+
+Cosa mostra: `BiConsumer`, l'interfaccia con due parametri che non restituisce nulla.
+
+```java
+BiConsumer<Libro, Integer> stampaCopie =
+    (libro, copie) -> System.out.println(libro.titolo() + ": " + copie + " copie");
+
+stampaCopie.accept(rosa, 3);                      // Il nome della rosa: 3 copie
+
+// Caso tipico: Map.forEach riceve chiave e valore
+Map<Genere, Long> libriPerGenere = Map.of(Genere.SAGGIO, 12L, Genere.FUMETTO, 5L);
+libriPerGenere.forEach((genere, quanti) -> System.out.println(genere + " -> " + quanti));
+
+// Concatenare due azioni sugli stessi argomenti con andThen
+BiConsumer<Libro, Integer> log =
+    (libro, copie) -> System.out.println("LOG: aggiornato " + libro.titolo());
+stampaCopie.andThen(log).accept(rosa, 3);         // prima stampa, poi log
+```
+
+- `accept(T, U)` ha due parametri e restituisce `void`: serve per fare un'azione, non per calcolare un risultato
+- `Map.forEach` vuole un `BiConsumer`, perché ogni elemento della mappa ha due parti (chiave e valore)
+- `andThen` esegue i due `BiConsumer` in sequenza, passando a entrambi gli **stessi** argomenti
+- Se ti serve un risultato, usa `BiFunction<T, U, R>` (metodo `apply`) al posto di `BiConsumer`
 
 #### Avanzato
 Cosa mostra: il pattern Strategy con le lambda, per le regole di multa.
