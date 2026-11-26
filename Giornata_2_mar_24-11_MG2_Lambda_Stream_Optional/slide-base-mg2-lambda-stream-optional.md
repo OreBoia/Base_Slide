@@ -505,6 +505,7 @@ Obiettivo: nel dominio di un e-commerce, definire `Ordine(cliente, categoria, im
 - Serve a evitare le `NullPointerException` quando un risultato può mancare
 - **Creazione**: `Optional.of(x)` (x non può essere `null`), `Optional.ofNullable(x)` (accetta `null`), `Optional.empty()`
 - **Uso**: `isPresent()`, `isEmpty()`, `ifPresent(...)`, `ifPresentOrElse(...)`
+- **`ifPresent` vuole un `Consumer`**: una funzione che riceve il valore e non restituisce nulla (lambda o method reference). Non esiste `ifPresent()` senza argomento: non compila. Per gestire anche il caso vuoto c'è `ifPresentOrElse(Consumer, Runnable)` (da Java 9)
 - **Valore di ripiego**: `orElse(...)`, `orElseGet(...)` (calcolato solo se serve), `orElseThrow(...)` (lancia un'eccezione)
 - **Trasformazioni**: `map`, `filter`; `flatMap` quando la funzione restituisce già un `Optional`
 - `get()` senza controllo lancia `NoSuchElementException`: evitarlo
