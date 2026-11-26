@@ -17,12 +17,16 @@ public class Main {
 
         // 1. Media dei voti per corso (TreeMap: chiavi in ordine alfabetico)
         Map<String, Double> mediaPerCorso = studenti.stream()
-            .collect(Collectors.groupingBy(Studente::corso, TreeMap::new, Collectors.averagingInt(Studente::voto)));
+            .collect(Collectors.groupingBy( Studente::corso, 
+                                            TreeMap::new, 
+                                            Collectors.averagingInt(Studente::voto)));
         System.out.println("Media per corso: " + mediaPerCorso);
 
         // 2. Numero di studenti per corso
         Map<String, Long> studentiPerCorso = studenti.stream()
-            .collect(Collectors.groupingBy(Studente::corso, TreeMap::new, Collectors.counting()));
+            .collect(Collectors.groupingBy( Studente::corso, 
+                                            TreeMap::new, 
+                                            Collectors.counting()));
         System.out.println("Studenti per corso: " + studentiPerCorso);
 
         // 3. Nomi degli studenti con voto sopra la media generale
